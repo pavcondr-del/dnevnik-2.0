@@ -68,17 +68,6 @@ interface ShellProps {
   onNavigate: (page: Page) => void;
 }
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <img src="./icons/icon.svg" alt="" className="h-9 w-9" />
-      <span className="text-lg font-bold tracking-tight">
-        Гармония <span className="text-accent">Рациона</span>
-      </span>
-    </div>
-  );
-}
-
 function NavLink({ item, active, onNavigate }: { item: NavItem; active: boolean; onNavigate: () => void }) {
   const Icon = item.icon;
   return (
@@ -139,7 +128,9 @@ export function Shell({ children, currentPage, onNavigate }: ShellProps) {
       {/* Сайдбар (десктоп) */}
       <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-line bg-surface md:flex">
         <div className="px-5 pb-4 pt-6">
-          <Logo />
+          <span className="text-lg font-bold tracking-tight">
+            Гармония <span className="text-accent">Рациона</span>
+          </span>
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-faint">
@@ -183,7 +174,9 @@ export function Shell({ children, currentPage, onNavigate }: ShellProps) {
       <div className="md:pl-60">
         {/* Мобильная шапка */}
         <header className="no-print sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/85 px-4 py-3 backdrop-blur-md md:hidden">
-          <Logo />
+          <span className="text-lg font-bold tracking-tight">
+            Гармония <span className="text-accent">Рациона</span>
+          </span>
           <div className="flex items-center gap-1">
             {!online && (
               <span className="mr-1 rounded-full bg-warn/15 px-2 py-1 text-[11px] font-medium text-warn">

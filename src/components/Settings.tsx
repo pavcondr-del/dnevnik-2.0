@@ -81,7 +81,6 @@ export default function Settings() {
     }
     new Notification("Гармония Рациона 🔔", {
       body: "Напоминания о приёмах пищи работают!",
-      icon: "./icons/icon-192.png",
     });
   };
 

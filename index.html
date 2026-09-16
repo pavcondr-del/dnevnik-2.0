@@ -51,27 +51,15 @@
       .prerender-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         padding: 16px 20px;
         border-bottom: 1px solid #2a2a2a;
       }
-      .prerender-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .prerender-logo-icon {
-        width: 36px;
-        height: 36px;
-      }
-      .prerender-logo-text {
+      .prerender-title-only {
         font-size: 17px;
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 1.2;
-      }
-      .prerender-logo-text span {
-        color: #4ade80;
       }
       .prerender-main {
         flex: 1;
@@ -242,10 +230,7 @@
       <!-- Pre-rendered content for SSR/SEO — will be replaced by React on hydration -->
       <div class="prerender-app">
         <header class="prerender-header">
-          <div class="prerender-logo">
-            <img src="./icons/icon.svg" alt="" class="prerender-logo-icon" />
-            <div class="prerender-logo-text">Гармония <span>Рациона</span></div>
-          </div>
+          <div class="prerender-title-only">Гармония Рациона</div>
         </header>
 
         <main class="prerender-main">

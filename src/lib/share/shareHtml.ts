@@ -49,25 +49,12 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     margin-bottom: 20px;
   }
   .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #ff6b6b;
-    color: #121212;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 20px;
-  }
-  .app-name {
     font-size: 18px;
     color: #a0a0a0;
+  }
+  .app-name {
+    font-weight: 600;
+    color: #e6e6e6;
   }
   .meta {
     text-align: right;
@@ -206,8 +193,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
 <div class="container">
   <header>
     <div class="header-top">
-      <div class="brand">
-        <div class="logo">ГР</div>
+      <div>
         <span class="app-name">Гармония Рациона</span>
       </div>
       <div class="meta">
