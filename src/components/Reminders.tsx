@@ -60,8 +60,6 @@ export function Reminders() {
           try {
             new Notification(title, {
               body,
-              icon: "./icons/icon-192.png",
-              badge: "./icons/icon-192.png",
             });
           } catch {
             /* игнор */

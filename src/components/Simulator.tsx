@@ -46,7 +46,7 @@ export default function Simulator() {
     return Math.round(total / 14);
   }, [state.entries]);
 
-  // Итоговый дефицит
+  // Итоговый дефицит с валидацией
   const totalDeficit = useMemo(() => {
     let total = deficit;
     if (noEveningSnacks) total += eveningSnackAvg;
@@ -54,16 +54,20 @@ export default function Simulator() {
     return total + extraBurn;
   }, [deficit, noEveningSnacks, eveningSnackAvg, reduce100, extraBurn]);
 
-  // Прогноз
+  // Валидация: дефицит не должен превышать TDEE * 0.25 (безопасный предел)
+  const maxSafeDeficit = Math.round(targets.tdee * 0.25);
+  const validatedTotalDeficit = Math.min(totalDeficit, maxSafeDeficit);
+
+  // Прогноз с использованием валидированного дефицита
   const projection = useMemo(() => {
     return projectWeight({
       currentWeightKg: currentWeight,
       targetWeightKg: targetWeight,
       tdee: targets.tdee,
       dailyDeficit: deficit,
-      extraBurnPerDay: totalDeficit - deficit,
+      extraBurnPerDay: validatedTotalDeficit - deficit,
     });
-  }, [currentWeight, targetWeight, targets.tdee, deficit, totalDeficit]);
+  }, [currentWeight, targetWeight, targets.tdee, deficit, validatedTotalDeficit]);
 
   // Данные для графика
   const chartData = useMemo(() => {
@@ -85,7 +89,7 @@ export default function Simulator() {
   }, [currentWeight, targetWeight, projection]);
 
   const handleApply = () => {
-    const deficitPercent = Math.round((totalDeficit / targets.tdee) * 100);
+    const deficitPercent = Math.round((validatedTotalDeficit / targets.tdee) * 100);
     saveProfile({
       ...state.profile,
       targetWeightKg: targetWeight,
@@ -321,7 +325,7 @@ export default function Simulator() {
           <div>
             <div className="font-semibold">Применить к профилю</div>
             <div className="text-sm text-mut">
-              Обновить норму калорий на {targets.tdee - totalDeficit} ккал/день
+              Обновить норму калорий на {targets.tdee - validatedTotalDeficit} ккал/день
             </div>
           </div>
           <Button onClick={() => setConfirmOpen(true)}>Применить</Button>
@@ -333,7 +337,7 @@ export default function Simulator() {
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleApply}
         title="Применить настройки?"
-        text={`Обновить норму калорий в профиле на ${targets.tdee - totalDeficit} ккал/день?`}
+        text={`Обновить норму калорий в профиле на ${targets.tdee - validatedTotalDeficit} ккал/день?`}
       />
     </div>
   );

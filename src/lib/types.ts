@@ -139,7 +139,7 @@ export interface ReminderSettings {
 export interface Settings {
   units: Units;
   accent: Accent;
-  theme: "dark" | "amoled" | "light";
+  theme: "dark" | "amoled" | "light" | "pastel";
   language: string;
   notifications: boolean;
   reminders: ReminderSettings;

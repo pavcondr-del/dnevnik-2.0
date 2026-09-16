@@ -38,6 +38,8 @@ import type { MealType } from "../lib/types";
 
 function CorrelationsBlock() {
   const { state } = useStore();
+  const targets = useMemo(() => calcTargets(state.profile), [state.profile]);
+  const targetKcal = targets.kcal;
   
   // Собираем данные за последние 30 дней
   const last30Days = useMemo(() => {
@@ -50,7 +52,7 @@ function CorrelationsBlock() {
       result.push({ date, totals, checkin });
     }
     return result;
-  }, [state.entries, state.checkins]);
+  }, [state.entries, state.checkins, state.profile]);
 
   // Фильтруем только дни с данными (есть и еда, и чек-ин)
   const daysWithData = last30Days.filter((d) => d.totals.kcal > 0 && d.checkin);
@@ -65,9 +67,9 @@ function CorrelationsBlock() {
     );
   }
 
-  // Расчёт средних значений
-  const daysWithDeficit = daysWithData.filter((d) => d.totals.kcal < 2000);
-  const daysWithSurplus = daysWithData.filter((d) => d.totals.kcal >= 2000);
+  // Расчёт средних значений относительно целевой калорийности пользователя
+  const daysWithDeficit = daysWithData.filter((d) => d.totals.kcal < targetKcal);
+  const daysWithSurplus = daysWithData.filter((d) => d.totals.kcal >= targetKcal);
   
   const avgEnergyDeficit = daysWithDeficit.length > 0
     ? daysWithDeficit.reduce((sum, d) => sum + (d.checkin?.energy ?? 0), 0) / daysWithDeficit.length
@@ -147,7 +149,12 @@ export default function Statistics() {
   const [customDateTo, setCustomDateTo] = useState(todayKey());
   
   const days = range === "1" ? 1 : range === "7" ? 7 : range === "30" ? 30 : 
-    Math.max(1, Math.floor((new Date(customDateTo).getTime() - new Date(customDateFrom).getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    (() => {
+      const from = new Date(customDateFrom + "T00:00:00");
+      const to = new Date(customDateTo + "T00:00:00");
+      const diff = Math.floor((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      return Math.max(1, diff);
+    })();
 
   const targets = useMemo(
     () => calcTargets(state.profile),

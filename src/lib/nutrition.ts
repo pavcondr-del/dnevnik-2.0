@@ -50,12 +50,22 @@ export function calcTargets(p: Profile): DayTargets {
   // Белки — по весу, жиры — 0.9 г/кг (минимум 45 г), углеводы — остаток калорий
   const protein = Math.round(p.weightKg * GOAL_META[p.goal].proteinPerKg);
   const fat = Math.max(45, Math.round(p.weightKg * 0.9));
+  const caloriesFromProteinAndFat = protein * 4 + fat * 9;
+  
+  // Валидация: если белки и жиры уже превышают целевую калорийность, уменьшаем жиры
+  let adjustedFat = fat;
+  if (caloriesFromProteinAndFat > kcal) {
+    // Пересчитываем жиры так, чтобы оставалось хотя бы 40 г углеводов
+    const maxCaloriesForFat = kcal - protein * 4 - 40 * 4; // 40 г углеводов минимум
+    adjustedFat = Math.max(45, Math.floor(maxCaloriesForFat / 9));
+  }
+  
   const carbs = Math.max(
     40,
-    Math.round((kcal - protein * 4 - fat * 9) / 4)
+    Math.round((kcal - protein * 4 - adjustedFat * 9) / 4)
   );
   
-  return { bmr, tdee, kcal, protein, fat, carbs };
+  return { bmr, tdee, kcal, protein, fat: adjustedFat, carbs };
 }
 
 export function scaleNutrition(

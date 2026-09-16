@@ -3,4 +3,5 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+// Hydrate вместо render для соответствия с pre-rendered HTML в index.html
+ReactDOM.hydrateRoot(document.getElementById("root")!, <App />);

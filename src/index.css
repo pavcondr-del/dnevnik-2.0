@@ -98,6 +98,207 @@ html[data-theme="light"] {
   --shadow-pop: 0 12px 40px -8px rgba(0, 0, 0, 0.18);
 }
 
+/* Warm theme - тёплый постельный (персиковый) */
+html[data-theme="warm"] {
+  color-scheme: light;
+  --color-bg: #FFF5F0;
+  --color-surface: #FFE8E0;
+  --color-card: #FFFCFA;
+  --color-elev: #FFF0E8;
+  --color-line: #FADCD0;
+  --color-txt: #4A3B32;
+  --color-mut: #8D7B6B;
+  --color-faint: #B5A595;
+  
+  --color-good: #5cb85c;
+  --color-warn: #f0ad4e;
+  --color-bad: #C05640;
+  --color-teal: #D97757;
+  
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  
+  --shadow-card: 0 2px 8px rgba(217, 119, 87, 0.08), 0 4px 16px -2px rgba(217, 119, 87, 0.1);
+  --shadow-pop: 0 12px 40px -8px rgba(217, 119, 87, 0.15);
+}
+
+html[data-theme="warm"] .chip {
+  background: var(--color-elev);
+}
+
+html[data-theme="warm"] ::-webkit-scrollbar-thumb {
+  background: #E8C4B8;
+}
+
+html[data-theme="warm"] ::-webkit-scrollbar-thumb:hover {
+  background: #D8B4A8;
+}
+
+/* Default accent for warm theme (coral) */
+html[data-theme="warm"] {
+  --color-accent: #D97757;
+  --color-accent-2: #E98767;
+}
+
+html[data-theme="warm"][data-accent="teal"] {
+  --color-accent: #5FB8B0;
+  --color-accent-2: #6FC8C0;
+}
+
+html[data-theme="warm"][data-accent="violet"] {
+  --color-accent: #B488C8;
+  --color-accent-2: #C498D8;
+}
+
+html[data-theme="warm"][data-accent="green"] {
+  --color-accent: #78C880;
+  --color-accent-2: #88D890;
+}
+
+html[data-theme="warm"][data-accent="blue"] {
+  --color-accent: #88B8D8;
+  --color-accent-2: #98C8E8;
+}
+
+html[data-theme="warm"][data-accent="amber"] {
+  --color-accent: #E0B868;
+  --color-accent-2: #F0C878;
+}
+
+/* Sky theme - цвет мягкого неба */
+html[data-theme="sky"] {
+  color-scheme: light;
+  --color-bg: #F0F8FF;
+  --color-surface: #E6F4FF;
+  --color-card: #FAFDFF;
+  --color-elev: #EAF4FF;
+  --color-line: #D6EAF8;
+  --color-txt: #2C3E50;
+  --color-mut: #5D737E;
+  --color-faint: #8FA1B3;
+  
+  --color-good: #5cb85c;
+  --color-warn: #f0ad4e;
+  --color-bad: #E74C3C;
+  --color-teal: #3498DB;
+  
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  
+  --shadow-card: 0 2px 8px rgba(52, 152, 219, 0.08), 0 4px 16px -2px rgba(52, 152, 219, 0.1);
+  --shadow-pop: 0 12px 40px -8px rgba(52, 152, 219, 0.15);
+}
+
+html[data-theme="sky"] .chip {
+  background: var(--color-elev);
+}
+
+html[data-theme="sky"] ::-webkit-scrollbar-thumb {
+  background: #B8D4E8;
+}
+
+html[data-theme="sky"] ::-webkit-scrollbar-thumb:hover {
+  background: #A8C4D8;
+}
+
+/* Default accent for sky theme (blue) */
+html[data-theme="sky"] {
+  --color-accent: #3498DB;
+  --color-accent-2: #44A8EB;
+}
+
+html[data-theme="sky"][data-accent="teal"] {
+  --color-accent: #48B8B0;
+  --color-accent-2: #58C8C0;
+}
+
+html[data-theme="sky"][data-accent="violet"] {
+  --color-accent: #9478C8;
+  --color-accent-2: #A488D8;
+}
+
+html[data-theme="sky"][data-accent="green"] {
+  --color-accent: #58B860;
+  --color-accent-2: #68C870;
+}
+
+html[data-theme="sky"][data-accent="blue"] {
+  --color-accent: #3498DB;
+  --color-accent-2: #44A8EB;
+}
+
+html[data-theme="sky"][data-accent="amber"] {
+  --color-accent: #D0A858;
+  --color-accent-2: #E0B868;
+}
+
+/* Pastel theme - мягкие постельные тона */
+html[data-theme="pastel"] {
+  color-scheme: light;
+  --color-bg: #fdf6f0;
+  --color-surface: #fff9f5;
+  --color-card: #fffefc;
+  --color-elev: #f9f4f0;
+  --color-line: #e8ddd4;
+  --color-txt: #2d2d2d;
+  --color-mut: #6a6a6a;
+  --color-faint: #9a9a9a;
+  
+  --color-good: #5cb85c;
+  --color-warn: #f0ad4e;
+  --color-bad: #d9534f;
+  --color-teal: #5bc0be;
+  
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  
+  --shadow-card: 0 2px 8px rgba(168, 128, 100, 0.08), 0 4px 16px -2px rgba(168, 128, 100, 0.1);
+  --shadow-pop: 0 12px 40px -8px rgba(168, 128, 100, 0.15);
+}
+
+html[data-theme="pastel"] .chip {
+  background: var(--color-elev);
+}
+
+html[data-theme="pastel"] ::-webkit-scrollbar-thumb {
+  background: #d4c4b8;
+}
+
+html[data-theme="pastel"] ::-webkit-scrollbar-thumb:hover {
+  background: #c4b4a8;
+}
+
+/* Default accent for pastel theme (soft coral) */
+html[data-theme="pastel"] {
+  --color-accent: #e8a598;
+  --color-accent-2: #f0b5a8;
+}
+
+html[data-theme="pastel"][data-accent="teal"] {
+  --color-accent: #7ec8c0;
+  --color-accent-2: #8ed8d0;
+}
+
+html[data-theme="pastel"][data-accent="violet"] {
+  --color-accent: #c4a8d8;
+  --color-accent-2: #d4b8e8;
+}
+
+html[data-theme="pastel"][data-accent="green"] {
+  --color-accent: #98d8a0;
+  --color-accent-2: #a8e8b0;
+}
+
+html[data-theme="pastel"][data-accent="blue"] {
+  --color-accent: #a8c8e8;
+  --color-accent-2: #b8d8f8;
+}
+
+html[data-theme="pastel"][data-accent="amber"] {
+  --color-accent: #f0c888;
+  --color-accent-2: #ffd898;
+}
+
 html[data-theme="light"] .chip {
   background: var(--color-elev);
 }

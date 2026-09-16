@@ -46,6 +46,10 @@ export default function Profile() {
       return toast.push("Проверьте вес", "err");
     if (draft.heightCm < 120 || draft.heightCm > 230)
       return toast.push("Проверьте рост", "err");
+    // Валидация целевого веса: пустая строка или NaN не должны сохраняться как 0
+    if (draft.targetWeightKg != null && (isNaN(draft.targetWeightKg) || draft.targetWeightKg <= 0)) {
+      return toast.push("Целевой вес должен быть больше 0", "err");
+    }
 
     saveProfile(draft);
     if (!state.weights.some((w) => w.date === todayKey())) {
