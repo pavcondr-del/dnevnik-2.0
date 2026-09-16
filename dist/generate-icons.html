@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор PWA иконок</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #4ECDC4;
+    }
+    p {
+      color: #a0a0a0;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: #1e1e1e;
+      border: 1px solid #3a3a3a;
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .card img {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 1rem;
+      display: block;
+      border-radius: 16px;
+    }
+    .card h3 {
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+    .card .size {
+      font-size: 0.75rem;
+      color: #6f6f6f;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: #4ECDC4;
+      color: #121212;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      width: 100%;
+    }
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .actions button {
+      flex: 1;
+    }
+    .btn-all {
+      background: #FF6B6B !important;
+      font-size: 1rem !important;
+      padding: 0.75rem !important;
+    }
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #1a1a1a;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #7BC67E;
+      display: none;
+    }
+    .status.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 Генератор PWA иконок</h1>
+    <p>Генерирует PNG иконки из SVG прямо в браузере. Скачайте и поместите в <code>public/icons/</code></p>
+    
+    <div class="grid" id="iconsGrid"></div>
+    
+    <div class="actions">
+      <button class="btn-all" onclick="downloadAll()">⬇️ Скачать все иконки</button>
+    </div>
+    
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const icons = [
+      { name: 'icon-192.png', size: 192, svg: 'icon-192.svg', label: 'Стандарт 192×192' },
+      { name: 'icon-512.png', size: 512, svg: 'icon-512.svg', label: 'Стандарт 512×512' },
+      { name: 'icon-maskable.png', size: 512, svg: 'icon-maskable.svg', label: 'Maskable 512×512' },
+      { name: 'apple-touch.png', size: 180, svg: 'icon-512.svg', label: 'Apple Touch 180×180' },
+    ];
+
+    const grid = document.getElementById('iconsGrid');
+    const status = document.getElementById('status');
+
+    // Создаём карточки
+    icons.forEach((icon, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <canvas id="canvas-${i}" width="${icon.size}" height="${icon.size}" style="display:none"></canvas>
+        <img id="preview-${i}" alt="${icon.label}" style="background:#1a1a1a">
+        <h3>${icon.name}</h3>
+        <p class="size">${icon.label}</p>
+        <button onclick="downloadIcon(${i})" id="btn-${i}">Скачать PNG</button>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Загружаем SVG и рендерим в canvas
+    async function loadAndRender(icon, index) {
+      try {
+        const response = await fetch(`./icons/${icon.svg}`);
+        const svgText = await response.text();
+        
+        const canvas = document.getElementById(`canvas-${index}`);
+        const ctx = canvas.getContext('2d');
+        
+        const img = new Image();
+        const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(svgBlob);
+        
+        img.onload = () => {
+          ctx.clearRect(0, 0, icon.size, icon.size);
+          ctx.drawImage(img, 0, 0, icon.size, icon.size);
+          URL.revokeObjectURL(url);
+          
+          const preview = document.getElementById(`preview-${index}`);
+          preview.src = canvas.toDataURL('image/png');
+        };
+        
+        img.src = url;
+      } catch (err) {
+        console.error(`Error loading ${icon.svg}:`, err);
+        // Fallback: рисуем иконку программно
+        drawFallbackIcon(icon, index);
+      }
+    }
+
+    // Fallback: рисуем иконку через Canvas API
+    function drawFallbackIcon(icon, index) {
+      const canvas = document.getElementById(`canvas-${index}`);
+      const ctx = canvas.getContext('2d');
+      const s = icon.size;
+      
+      // Background
+      ctx.fillStyle = '#1A1A1A';
+      const r = s * 0.22;
+      roundRect(ctx, 0, 0, s, s, r);
+      ctx.fill();
+      
+      // Progress ring
+      const cx = s / 2;
+      const cy = s * 0.53;
+      const radius = s * 0.265;
+      const lineWidth = s * 0.094;
+      
+      ctx.strokeStyle = '#FF6B6B';
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * 0.82);
+      ctx.stroke();
+      
+      // Flame
+      const flameH = s * 0.25;
+      const flameW = s * 0.15;
+      const flameY = cy - flameH * 0.3;
+      
+      ctx.fillStyle = '#4ECDC4';
+      ctx.beginPath();
+      ctx.moveTo(cx, flameY - flameH / 2);
+      ctx.bezierCurveTo(
+        cx - flameW, flameY - flameH * 0.15,
+        cx - flameW * 0.8, flameY + flameH * 0.3,
+        cx, flameY + flameH / 2
+      );
+      ctx.bezierCurveTo(
+        cx + flameW * 0.8, flameY + flameH * 0.3,
+        cx + flameW, flameY - flameH * 0.15,
+        cx, flameY - flameH / 2
+      );
+      ctx.fill();
+      
+      const preview = document.getElementById(`preview-${index}`);
+      preview.src = canvas.toDataURL('image/png');
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    // Скачивание
+    function downloadIcon(index) {
+      const canvas = document.getElementById(`canvas-${index}`);
+      const link = document.createElement('a');
+      link.download = icons[index].name;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showStatus(`✅ ${icons[index].name} скачан`);
+    }
+
+    async function downloadAll() {
+      for (let i = 0; i < icons.length; i++) {
+        downloadIcon(i);
+        await new Promise(r => setTimeout(r, 300));
+      }
+      showStatus('✅ Все иконки скачаны! Поместите их в папку public/icons/');
+    }
+
+    function showStatus(msg) {
+      status.textContent = msg;
+      status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 4000);
+    }
+
+    // Инициализация
+    icons.forEach((icon, i) => loadAndRender(icon, i));
+  </script>
+</body>
+</html>

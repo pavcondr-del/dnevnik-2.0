@@ -1,0 +1,38 @@
+{
+  "name": "Гармония Рациона",
+  "short_name": "Гармония Рациона",
+  "description": "Дневник питания, БЖУ, база продуктов, статистика и рецепты. Работает офлайн.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ru",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    { 
+      "src": "./icons/icon.svg", 
+      "sizes": "any", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    { 
+      "src": "./icons/icon-192.svg", 
+      "sizes": "192x192", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    { 
+      "src": "./icons/icon-512.svg", 
+      "sizes": "512x512", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    { 
+      "src": "./icons/icon-maskable.svg", 
+      "sizes": "512x512", 
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
