@@ -169,9 +169,11 @@ export default function Settings() {
           </p>
           <Segmented
             value={s.theme}
-            onChange={(v: "dark" | "amoled" | "light") => patch({ theme: v })}
+            onChange={(v: "dark" | "amoled" | "light" | "warm" | "sky") => patch({ theme: v })}
             options={[
               { value: "light", label: "☀️ Светлая" },
+              { value: "warm", label: "🔥 Тёплая" },
+              { value: "sky", label: "☁️ Небо" },
               { value: "dark", label: "🌙 Классическая" },
               { value: "amoled", label: "⚫ AMOLED" },
             ]}

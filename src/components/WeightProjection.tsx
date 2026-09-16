@@ -40,7 +40,13 @@ export default function WeightProjection() {
 
   const weeklyLoss = getWeeklyLoss();
   const weightToLose = currentWeight - targetWeight;
-  const weeksNeeded = Math.ceil(weightToLose / weeklyLoss);
+  
+  // Сброс calculated если вес цели достигнут или превышен
+  if (weightToLose <= 0 && calculated) {
+    setCalculated(false);
+  }
+  
+  const weeksNeeded = weightToLose > 0 ? Math.ceil(weightToLose / weeklyLoss) : 0;
   
   // Расчёт калорийного дефицита
   // 1 кг жира ≈ 7700 ккал

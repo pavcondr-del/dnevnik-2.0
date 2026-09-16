@@ -24,7 +24,7 @@ import type {
 import { SEED_PRODUCTS, buildDemo, seedRecipes } from "./seed";
 import { uid } from "./utils";
 
-const STORAGE_KEY = "kaloriyka-v1";
+const STORAGE_KEY = "kaloriyka-v2";
 
 const DEFAULT_PROFILE: Profile = {
   name: "",
@@ -160,8 +160,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* квота переполнена (обычно из-за фото) */
+    } catch (err) {
+      // Квота переполнена (обычно из-за фото) — уведомляем пользователя
+      if (err instanceof DOMException && err.name === "QuotaExceededError") {
+        console.warn("localStorage quota exceeded. Consider removing photos or exporting backup.");
+      }
     }
   }, [state]);
 
@@ -183,6 +186,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         dark: "#121212",
         amoled: "#000000",
         light: "#f5f5f7",
+        warm: "#FFF5F0",
+        sky: "#F0F8FF",
       };
       themeMeta.setAttribute("content", colors[state.settings.theme] ?? "#121212");
     }

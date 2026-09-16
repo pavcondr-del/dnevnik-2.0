@@ -1,28 +1,44 @@
 import type { ShareSnapshot, ShareOptions } from "./shareTypes";
 import { fmt, ruDate } from "../utils";
 
+// Экранирование HTML для защиты от XSS
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): string {
   const dateFrom = ruDate(snap.dateFrom);
   const dateTo = ruDate(snap.dateTo);
   const generated = new Date().toLocaleDateString("ru-RU");
   const author = opts.anonymize ? "Участник" : (opts.authorName || snap.profile.name || "Участник");
   const comment = opts.comment || "";
-
+  
   // SVG график веса
   const weightChartSvg = snap.weight.trend.length > 1 ? generateWeightChart(snap.weight.trend) : "";
-
+  
   // SVG график калорий
   const caloriesChartSvg = snap.calories.series.length > 0 ? generateCaloriesChart(snap.calories) : "";
-
+  
   // SVG БЖУ-пончик
   const macrosChartSvg = generateMacrosChart(snap.macros);
-
+  
+  const escapedDateFrom = escapeHtml(dateFrom);
+  const escapedDateTo = escapeHtml(dateTo);
+  const escapedGenerated = escapeHtml(generated);
+  const escapedAuthor = escapeHtml(author);
+  const escapedComment = escapeHtml(comment);
+  
   return `<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Отчёт · ${dateFrom} – ${dateTo} · Гармония Рациона</title>
+<title>Отчёт · ${escapedDateFrom} – ${escapedDateTo} · Гармония Рациона</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -197,14 +213,14 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
         <span class="app-name">Гармония Рациона</span>
       </div>
       <div class="meta">
-        <p class="period">${dateFrom} – ${dateTo}</p>
-        <p class="generated">Сформирован ${generated}</p>
+        <p class="period">${escapedDateFrom} – ${escapedDateTo}</p>
+        <p class="generated">Сформирован ${escapedGenerated}</p>
       </div>
     </div>
     <h1>Отчёт о питании</h1>
-    <p class="author">${author}</p>
+    <p class="author">${escapedAuthor}</p>
   </header>
-
+  
   <section class="summary">
     <div class="summary-card">
       <div class="summary-value">${snap.weight.deltaKg !== null ? (snap.weight.deltaKg > 0 ? "+" : "") + fmt(snap.weight.deltaKg, 1) + " кг" : "—"}</div>
@@ -223,7 +239,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
       <div class="summary-label">Текущая серия</div>
     </div>
   </section>
-
+  
   ${snap.weight.trend.length > 1 ? `
   <section class="chart-weight">
     <h2>Динамика веса</h2>
@@ -232,7 +248,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     </div>
   </section>
   ` : ""}
-
+  
   ${snap.calories.series.length > 0 ? `
   <section class="chart-calories">
     <h2>Калории по дням</h2>
@@ -241,7 +257,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     </div>
   </section>
   ` : ""}
-
+  
   <section class="macros">
     <h2>Макронутриенты</h2>
     <div class="macros-grid">
@@ -282,7 +298,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
       </div>
     </div>
   </section>
-
+  
   <section class="patterns">
     <h2>Паттерны питания</h2>
     <div class="patterns-grid">
@@ -290,7 +306,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
         <h3>Топ-10 продуктов</h3>
         ${snap.topProducts.length > 0 ? snap.topProducts.map((p) => `
           <div class="pattern-item">
-            <span>${p.name}</span>
+            <span>${escapeHtml(p.name)}</span>
             <span>${p.count} раз</span>
           </div>
         `).join("") : "<p>Нет данных</p>"}
@@ -299,14 +315,14 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
         <h3>Категории продуктов</h3>
         ${snap.categories.slice(0, 5).map((c) => `
           <div class="pattern-item">
-            <span>${c.name}</span>
+            <span>${escapeHtml(c.name)}</span>
             <span>${fmt(c.percent, 1)}%</span>
           </div>
         `).join("")}
       </div>
     </div>
   </section>
-
+  
   ${snap.activity.totalMinutes > 0 ? `
   <section class="activity">
     <h2>Физическая активность</h2>
@@ -325,7 +341,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
         <h3>Топ активности</h3>
         ${snap.activity.topTypes.map((a) => `
           <div class="pattern-item">
-            <span>${a.label}</span>
+            <span>${escapeHtml(a.label)}</span>
             <span>${a.minutes} мин · ${a.kcal} ккал</span>
           </div>
         `).join("")}
@@ -333,7 +349,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     ` : ""}
   </section>
   ` : ""}
-
+  
   ${opts.includeCheckins && snap.checkins ? `
   <section class="checkins">
     <h2>Самочувствие</h2>
@@ -353,31 +369,31 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     </div>
   </section>
   ` : ""}
-
+  
   ${opts.includeNotes && snap.notes && snap.notes.length > 0 ? `
   <section class="notes">
     <h2>Заметки</h2>
     ${snap.notes.map((n) => `
       <div class="pattern-card" style="margin-bottom: 15px;">
-        <div style="font-weight: 600; margin-bottom: 10px; color: #ff6b6b;">${ruDate(n.date)}</div>
-        <div style="margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${n.text}</div>
-        ${n.tags.length > 0 ? `<div style="font-size: 14px; color: #a0a0a0; word-wrap: break-word; overflow-wrap: break-word;">Теги: ${n.tags.join(", ")}</div>` : ""}
+        <div style="font-weight: 600; margin-bottom: 10px; color: #ff6b6b;">${escapeHtml(ruDate(n.date))}</div>
+        <div style="margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${escapeHtml(n.text)}</div>
+        ${n.tags.length > 0 ? `<div style="font-size: 14px; color: #a0a0a0; word-wrap: break-word; overflow-wrap: break-word;">Теги: ${escapeHtml(n.tags.join(", "))}</div>` : ""}
       </div>
     `).join("")}
   </section>
   ` : ""}
-
-  ${comment.length > 0 ? `
+  
+  ${escapedComment.length > 0 ? `
   <section class="comment">
     <h2>Комментарий к отчёту</h2>
     <div class="pattern-card">
-      <div style="word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${comment}</div>
+      <div style="word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${escapedComment}</div>
     </div>
   </section>
   ` : ""}
-
+  
   <footer>
-    <p>Сформирован приложением «Гармония Рациона» · ${generated}</p>
+    <p>Сформирован приложением «Гармония Рациона» · ${escapedGenerated}</p>
     <p class="disclaimer">Отчёт носит информационный характер.</p>
   </footer>
 </div>

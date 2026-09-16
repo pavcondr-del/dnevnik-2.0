@@ -1,5 +1,5 @@
 /* Гармония Рациона — офлайн-сервис-воркер (stale-while-revalidate) */
-const CACHE = "kaloriyka-v1";
+const CACHE = "kaloriyka-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
