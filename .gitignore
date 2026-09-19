@@ -2,12 +2,9 @@
 # Coverage reports
 coverage/
 
-# Build artifacts
-dist/
-
 # Dependencies
 node_modules/
 
-# Test results
+# Build artifacts
 .vite/
 ```
