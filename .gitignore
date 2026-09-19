@@ -1,3 +1,5 @@
 ```
-node_modules/
+# Documentation specific ignores (if needed)
+# No build artifacts, dependencies, or temp files detected in changes
+# Only documentation markdown files were added
 ```

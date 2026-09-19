@@ -441,9 +441,10 @@ describe('useStore - экспорт/импорт', () => {
   it('должен импортировать состояние из JSON', () => {
     const { result } = renderHook(() => useStore(), { wrapper });
     
+    const initialProfile = result.current.state.profile;
     const backup = JSON.stringify({
       version: 1,
-      profile: { ...result.current.state.profile, name: 'Imported' },
+      profile: { ...initialProfile, name: 'Imported' },
       settings: result.current.state.settings,
       products: [],
       entries: [],
@@ -462,6 +463,7 @@ describe('useStore - экспорт/импорт', () => {
       expect(success).toBe(true);
     });
     
+    // Проверяем, что состояние обновилось
     expect(result.current.state.profile.name).toBe('Imported');
   });
 
