@@ -17,6 +17,7 @@ export interface ShareOptions {
   cardSize: ShareCardSize;
   anonymize: boolean;
   comment?: string;
+  photoUrl?: string | null; // URL загруженного фото
 }
 
 export interface ShareSnapshot {

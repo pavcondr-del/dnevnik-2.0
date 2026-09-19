@@ -32,6 +32,33 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
   const [anonymize, setAnonymize] = useState(false);
   const [includeComment, setIncludeComment] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [showMacros, setShowMacros] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+
+  // Обработка загрузки фото
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Проверяем тип файла
+    if (!file.type.startsWith("image/")) {
+      toast.push("Выберите изображение", "err");
+      return;
+    }
+    
+    // Создаём URL для предпросмотра
+    const url = URL.createObjectURL(file);
+    setPhotoUrl(url);
+    toast.push("Фото загружено");
+  };
+
+  // Очистка URL при закрытии
+  useEffect(() => {
+    if (!open && photoUrl) {
+      URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(null);
+    }
+  }, [open, photoUrl]);
 
   // Инициализация дат при открытии
   useEffect(() => {
@@ -50,13 +77,14 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
     includeNotes,
     includeCheckins,
     includeWeight,
-    includeMacros,
+    includeMacros: showMacros, // Используем состояние чекбокса
     authorName,
     cardStyle,
     cardSize,
     anonymize,
     comment: includeComment ? commentText : undefined,
-  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, includeWeight, includeMacros, authorName, cardStyle, cardSize, anonymize, includeComment, commentText]);
+    photoUrl, // Передаём фото в опции
+  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, includeWeight, showMacros, authorName, cardStyle, cardSize, anonymize, includeComment, commentText, photoUrl]);
 
   const snapshot = useMemo(() => buildSnapshot(state, options), [state, options]);
 
@@ -164,6 +192,52 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
         {/* Настройки для карточки */}
         {format === "card" && (
           <div className="space-y-4">
+            {/* Загрузка фото */}
+            <div>
+              <label className="label">Фото для карточки</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-600 file:text-white
+                    hover:file:bg-blue-700
+                    cursor-pointer"
+                />
+                {photoUrl && (
+                  <button
+                    onClick={() => setPhotoUrl(null)}
+                    className="text-red-400 hover:text-red-300 text-sm"
+                  >
+                    Удалить
+                  </button>
+                )}
+              </div>
+              {photoUrl && (
+                <div className="mt-2">
+                  <img
+                    src={photoUrl}
+                    alt="Предпросмотр"
+                    className="h-20 w-20 object-cover rounded-md border border-gray-700"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Чекбокс для отображения КБЖУ */}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showMacros}
+                onChange={(e) => setShowMacros(e.target.checked)}
+              />
+              <span>Показать КБЖУ и ккал</span>
+            </label>
+
             <div>
               <label className="label">Стиль</label>
               <Segmented
