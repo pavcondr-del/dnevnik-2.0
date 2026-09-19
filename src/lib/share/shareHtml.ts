@@ -7,6 +7,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
   const generated = new Date().toLocaleDateString("ru-RU");
   const author = opts.anonymize ? "Участник" : (opts.authorName || snap.profile.name || "Участник");
   const comment = opts.comment || "";
+  const htmlNote = opts.htmlNote || "";
 
   // SVG график веса
   const weightChartSvg = snap.weight.trend.length > 1 ? generateWeightChart(snap.weight.trend) : "";
@@ -368,13 +369,13 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
   </section>
   ` : ""}
 
-  ${opts.includeNotes && snap.notes && snap.notes.length > 0 ? `
+  ${snap.notes && snap.notes.length > 0 ? `
   <section class="notes">
     <h2>Заметки</h2>
     ${snap.notes.map((n) => `
       <div class="pattern-card" style="margin-bottom: 15px;">
         <div style="font-weight: 600; margin-bottom: 10px; color: #ff6b6b;">${ruDate(n.date)}</div>
-        <div style="margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${n.text}</div>
+        <div style="font-size: 18px; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${n.text}</div>
         ${n.tags.length > 0 ? `<div style="font-size: 14px; color: #a0a0a0; word-wrap: break-word; overflow-wrap: break-word;">Теги: ${n.tags.join(", ")}</div>` : ""}
       </div>
     `).join("")}
@@ -386,6 +387,15 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
     <h2>Комментарий к отчёту</h2>
     <div class="pattern-card">
       <div style="word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${comment}</div>
+    </div>
+  </section>
+  ` : ""}
+
+  ${htmlNote.length > 0 ? `
+  <section class="html-note">
+    <h2>Заметка</h2>
+    <div class="pattern-card">
+      <div style="word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6; font-size: 18px;">${htmlNote}</div>
     </div>
   </section>
   ` : ""}

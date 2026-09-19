@@ -1,5 +1,5 @@
 import type { ShareSnapshot, ShareOptions } from "./shareTypes";
-import { fmt, ruDate } from "../utils";
+import { fmt } from "../utils";
 
 interface StyleConfig {
   bg: string;
@@ -65,12 +65,31 @@ export async function generateShareCard(
   // Дождаться загрузки шрифтов
   await document.fonts.ready;
 
-  // Фон
-  ctx.fillStyle = style.bg;
-  ctx.fillRect(0, 0, size.width, size.height);
+  // Фон: фото или сплошной цвет
+  if (opts.cardPhoto) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    await new Promise<void>((resolve) => {
+      img.onload = () => resolve();
+      img.src = opts.cardPhoto!;
+    });
+    
+    // Растягиваем фото на весь канвас с crop по центру
+    const scale = Math.max(size.width / img.width, size.height / img.height);
+    const x = (size.width - img.width * scale) / 2;
+    const y = (size.height - img.height * scale) / 2;
+    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    
+    // Полупрозрачный оверлей для читаемости текста
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, size.width, size.height);
+  } else {
+    ctx.fillStyle = style.bg;
+    ctx.fillRect(0, 0, size.width, size.height);
+  }
 
   // Градиент для sport
-  if (opts.cardStyle === "sport") {
+  if (opts.cardStyle === "sport" && !opts.cardPhoto) {
     const gradient = ctx.createLinearGradient(0, 0, 0, size.height);
     gradient.addColorStop(0, "#0e0e0e");
     gradient.addColorStop(1, "#1a1a1a");
@@ -81,60 +100,30 @@ export async function generateShareCard(
   const padding = 60;
   let y = padding;
 
-  // Шапка: монограмма + название
-  ctx.fillStyle = style.accent;
-  ctx.beginPath();
-  ctx.arc(padding + 30, y + 30, 30, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = style.bg;
-  ctx.font = "bold 32px system-ui, -apple-system, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("ГР", padding + 30, y + 42);
-
-  ctx.fillStyle = style.textSecondary;
-  ctx.font = "400 20px system-ui, -apple-system, sans-serif";
-  ctx.textAlign = "left";
-  ctx.fillText("Гармония Рациона", padding + 80, y + 38);
-
-  y += 100;
-
-  // Период
+  // Шапка с логотипом
   ctx.fillStyle = style.text;
-  ctx.font = "600 32px system-ui, -apple-system, sans-serif";
+  ctx.font = "700 36px system-ui, -apple-system, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("Гармония Рациона", padding, y + 40);
+  
+  // Логотип "ГР" справа вверху
+  ctx.textAlign = "right";
+  const logoX = size.width - padding;
+  const logoY = y + 25;
+  ctx.fillStyle = "#ff6b6b";
+  ctx.beginPath();
+  ctx.arc(logoX, logoY, 25, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#121212";
+  ctx.font = "800 24px system-ui, -apple-system, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(
-    `${ruDate(snap.dateFrom)} – ${ruDate(snap.dateTo)}`,
-    size.width / 2,
-    y
-  );
-
+  ctx.fillText("ГР", logoX, logoY + 9);
+  
   y += 80;
 
-  // Главный показатель
-  if (snap.weight.deltaKg !== null && opts.cardStyle !== "noNumbers") {
-    const delta = snap.weight.deltaKg;
-    const sign = delta > 0 ? "+" : "";
-    const color = delta < 0 ? style.positive : style.negative;
-
-    ctx.fillStyle = color;
-    ctx.font = "800 120px system-ui, -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(`${sign}${fmt(delta, 1)} кг`, size.width / 2, y + 100);
-
-    y += 150;
-  } else if (opts.cardStyle !== "noNumbers") {
-    // Средние калории
-    ctx.fillStyle = style.accent;
-    ctx.font = "800 100px system-ui, -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(`${fmt(snap.calories.average)} ккал`, size.width / 2, y + 80);
-
-    y += 130;
-  }
-
-  // Три метрики в ряд
-  if (opts.cardStyle !== "noNumbers") {
+  // Главный показатель (если включены макросы или стиль не noNumbers)
+  if (opts.includeCardMacros && opts.cardStyle !== "noNumbers") {
+    // Три метрики в ряд: Калории, Белки, Серия
     const metrics = [
       { label: "Калории", value: `${fmt(snap.calories.average)} ккал` },
       { label: "Белки", value: `${fmt(snap.macros.protein.avg, 1)} г` },
@@ -157,10 +146,29 @@ export async function generateShareCard(
     });
 
     y += 130;
+  } else if (snap.weight.deltaKg !== null && opts.cardStyle !== "noNumbers") {
+    const delta = snap.weight.deltaKg;
+    const sign = delta > 0 ? "+" : "";
+    const color = delta < 0 ? style.positive : style.negative;
+
+    ctx.fillStyle = color;
+    ctx.font = "800 120px system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`${sign}${fmt(delta, 1)} кг`, size.width / 2, y + 100);
+
+    y += 150;
+  } else if (opts.cardStyle !== "noNumbers") {
+    // Средние калории
+    ctx.fillStyle = style.accent;
+    ctx.font = "800 100px system-ui, -apple-system, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`${fmt(snap.calories.average)} ккал`, size.width / 2, y + 80);
+
+    y += 130;
   }
 
-  // Мини-график (только для square и wide)
-  if ((opts.cardSize === "square" || opts.cardSize === "wide") && snap.calories.series.length > 1) {
+  // Мини-график (только для square и wide и если включены макросы)
+  if (opts.includeCardMacros && (opts.cardSize === "square" || opts.cardSize === "wide") && snap.calories.series.length > 1) {
     const chartHeight = 150;
     const chartWidth = size.width - padding * 2;
     const maxKcal = Math.max(...snap.calories.series.map((s) => s.kcal));
@@ -184,12 +192,41 @@ export async function generateShareCard(
     y += chartHeight + 50;
   }
 
-  // Футер
-  ctx.fillStyle = style.textSecondary;
-  ctx.font = "400 20px system-ui, -apple-system, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("Гармония Рациона", size.width / 2, size.height - 80);
-  ctx.fillText(new Date().toLocaleDateString("ru-RU"), size.width / 2, size.height - 50);
+  // Заметка (если есть)
+  if (opts.cardNote) {
+    y += 30;
+    const noteMaxWidth = size.width - padding * 2;
+    const noteFontSize = 36; // Увеличенный размер шрифта
+    ctx.fillStyle = style.text;
+    ctx.font = `600 ${noteFontSize}px system-ui, -apple-system, sans-serif`;
+    ctx.textAlign = "center";
+    
+    // Разбивка текста на строки
+    const words = opts.cardNote.split(" ");
+    let line = "";
+    const lines: string[] = [];
+    
+    for (const word of words) {
+      const testLine = line + word + " ";
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > noteMaxWidth && line !== "") {
+        lines.push(line.trim());
+        line = word + " ";
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line.trim());
+    
+    // Центрирование блока заметки по вертикали
+    const noteBlockHeight = lines.length * (noteFontSize + 10);
+    const availableHeight = size.height - y - 100;
+    const startY = y + Math.max(0, (availableHeight - noteBlockHeight) / 2);
+    
+    lines.forEach((l, i) => {
+      ctx.fillText(l, size.width / 2, startY + i * (noteFontSize + 10));
+    });
+  }
 
   // Конвертация в Blob
   return new Promise((resolve) => {
