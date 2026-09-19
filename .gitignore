@@ -1,5 +1,7 @@
 ```
-# Documentation specific ignores (if needed)
-# No build artifacts, dependencies, or temp files detected in changes
-# Only documentation markdown files were added
+# Dependencies
+node_modules/
+
+# Vite/Vitest cache
+.node_vite/
 ```
