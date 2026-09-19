@@ -291,20 +291,20 @@ export async function generateShareCard(
     y += chartHeight + 50;
   }
 
-  // Футер
+  // Футер - только пользовательская заметка и логотип (без даты, серии и названия приложения)
   ctx.fillStyle = style.textSecondary;
   ctx.font = "400 20px system-ui, -apple-system, sans-serif";
   ctx.textAlign = "center";
-  
-  // Пользовательская заметка (если есть) - размещаем перед датой
+
+  // Пользовательская заметка (если есть)
   let footerY = size.height - 80;
   if (opts.userNote) {
     const noteLines = opts.userNote.split('\n');
     const maxCharsPerLine = Math.floor((size.width - padding * 2) / 18);
-    
+
     ctx.fillStyle = style.text;
     ctx.font = "normal 22px system-ui, -apple-system, sans-serif";
-    
+
     noteLines.forEach(line => {
       const wrappedLines = line.match(new RegExp(`.{1,${maxCharsPerLine}}`, 'g')) || [];
       wrappedLines.forEach(wrappedLine => {
@@ -312,15 +312,20 @@ export async function generateShareCard(
         footerY -= 35;
       });
     });
-    
-    footerY -= 20;
-  }
-  
-  ctx.fillStyle = style.textSecondary;
-  ctx.font = "400 20px system-ui, -apple-system, sans-serif";
-  ctx.fillText("Гармония Рациона", size.width / 2, footerY);
-  ctx.fillText(new Date().toLocaleDateString("ru-RU"), size.width / 2, footerY - 30);
 
+    footerY -= 40;
+  }
+
+  // Логотип в футере
+  ctx.fillStyle = style.accent;
+  ctx.beginPath();
+  ctx.arc(size.width / 2, footerY + 20, 25, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = style.bg;
+  ctx.font = "bold 24px system-ui, -apple-system, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("ГР", size.width / 2, footerY + 30);
   // Конвертация в Blob
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {

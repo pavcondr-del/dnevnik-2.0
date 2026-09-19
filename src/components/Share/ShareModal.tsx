@@ -356,42 +356,25 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
         {/* Настройки для HTML */}
         {format === "html" && (
           <div className="space-y-4">
-            {/* Загрузка фото для HTML */}
-            <div>
-              <label className="label">Фото для отчёта (опционально)</label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  id="html-photo-upload"
-                />
-                <label
-                  htmlFor="html-photo-upload"
-                  className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
-                >
-                  Выбрать файл
-                </label>
-                {photoUrl && (
-                  <button
-                    onClick={() => setPhotoUrl(null)}
-                    className="text-red-500 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium"
-                  >
-                    Удалить
-                  </button>
-                )}
-              </div>
-              {photoUrl && (
-                <div className="mt-2">
-                  <img
-                    src={photoUrl}
-                    alt="Предпросмотр"
-                    className="h-20 w-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-                  />
-                </div>
-              )}
-            </div>
+            {/* Чекбокс для пользовательской заметки */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includeUserNote}
+                onChange={(e) => setIncludeUserNote(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">Добавить заметку</span>
+            </label>
+            {includeUserNote && (
+              <textarea
+                value={userNoteText}
+                onChange={(e) => setUserNoteText(e.target.value)}
+                placeholder="Ваш текст..."
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm resize-none"
+              />
+            )}
 
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -400,7 +383,7 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
                 onChange={(e) => setIncludeNotes(e.target.checked)}
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Включить заметки</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Включить заметки из дневника</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
