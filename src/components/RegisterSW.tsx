@@ -11,7 +11,7 @@ export function RegisterSW() {
 
     const onLoad = () => {
       navigator.serviceWorker.register("./sw.js").catch(() => {
-        /* офлайн-кэширование недоступно — не критично */
+        /* кэширование недоступно — не критично */
       });
     };
 
