@@ -18,6 +18,7 @@ export interface ShareOptions {
   anonymize: boolean;
   comment?: string;
   photoUrl?: string | null; // URL загруженного фото
+  userNote?: string; // Пользовательская заметка
 }
 
 export interface ShareSnapshot {
