@@ -12,11 +12,16 @@ export interface ShareOptions {
   includeCheckins: boolean;
   includeWeight: boolean;
   includeMacros: boolean;
+  includeCardMacros: boolean;
   authorName?: string;
   cardStyle: ShareCardStyle;
   cardSize: ShareCardSize;
   anonymize: boolean;
   comment?: string;
+  cardNote?: string;
+  cardPhoto?: string;
+  htmlNote?: string;
+  messengerNote?: string;
 }
 
 export interface ShareSnapshot {

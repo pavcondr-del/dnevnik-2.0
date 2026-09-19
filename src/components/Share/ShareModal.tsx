@@ -26,12 +26,17 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
   const [includeCheckins, setIncludeCheckins] = useState(false);
   const [includeWeight, setIncludeWeight] = useState(true);
   const [includeMacros, setIncludeMacros] = useState(true);
+  const [includeCardMacros, setIncludeCardMacros] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [cardStyle, setCardStyle] = useState<ShareCardStyle>("minimal");
   const [cardSize, setCardSize] = useState<ShareCardSize>("square");
   const [anonymize, setAnonymize] = useState(false);
-  const [includeComment, setIncludeComment] = useState(false);
-  const [commentText, setCommentText] = useState("");
+  const [showCardNote, setShowCardNote] = useState(false);
+  const [cardNote, setCardNote] = useState("");
+  const [cardPhoto, setCardPhoto] = useState<string | undefined>(undefined);
+  const [showHtmlNote, setShowHtmlNote] = useState(false);
+  const [htmlNote, setHtmlNote] = useState("");
+  const [messengerNote, setMessengerNote] = useState("");
 
   // Инициализация дат при открытии
   useEffect(() => {
@@ -51,12 +56,17 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
     includeCheckins,
     includeWeight,
     includeMacros,
+    includeCardMacros,
     authorName,
     cardStyle,
     cardSize,
     anonymize,
-    comment: includeComment ? commentText : undefined,
-  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, includeWeight, includeMacros, authorName, cardStyle, cardSize, anonymize, includeComment, commentText]);
+    comment: undefined,
+    cardNote: showCardNote ? (cardNote || undefined) : undefined,
+    cardPhoto: showCardNote ? cardPhoto : undefined,
+    htmlNote: showHtmlNote ? (htmlNote || undefined) : undefined,
+    messengerNote: messengerNote || undefined,
+  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, includeWeight, includeMacros, includeCardMacros, authorName, cardStyle, cardSize, anonymize, showCardNote, cardNote, cardPhoto, showHtmlNote, htmlNote, messengerNote]);
 
   const snapshot = useMemo(() => buildSnapshot(state, options), [state, options]);
 
@@ -195,7 +205,68 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
                 checked={anonymize}
                 onChange={(e) => setAnonymize(e.target.checked)}
               />
-              <span>Скрыть имя</span>
+              <span>Анонимизировать</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showCardNote}
+                onChange={(e) => setShowCardNote(e.target.checked)}
+              />
+              <span>Заметка</span>
+            </label>
+            {showCardNote && (
+              <>
+                <div>
+                  <label className="label">Текст заметки</label>
+                  <textarea
+                    className="input min-h-[80px] resize-y"
+                    value={cardNote}
+                    onChange={(e) => setCardNote(e.target.value)}
+                    placeholder="Ваша заметка..."
+                  />
+                </div>
+                <div>
+                  <label className="label">Фото фона</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setCardPhoto(event.target?.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                      id="photo-upload"
+                    />
+                    <label htmlFor="photo-upload" className="btn-outline px-4 py-2 rounded cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700">
+                      Загрузить фото
+                    </label>
+                    {cardPhoto && (
+                      <button
+                        onClick={() => setCardPhoto(undefined)}
+                        className="text-red-500 hover:text-red-600 text-sm"
+                      >
+                        Удалить
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={includeCardMacros}
+                onChange={(e) => setIncludeCardMacros(e.target.checked)}
+              />
+              <span>Добавить КБЖУ</span>
             </label>
             <Button onClick={handleDownloadCard} className="w-full">
               <DownloadIcon size={18} />
@@ -204,17 +275,9 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
           </div>
         )}
 
-        {/* Настройки для текста */}
-        {format === "text" && (
+        {/* Настройки для HTML */}
+        {format === "html" && (
           <div className="space-y-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={includeNotes}
-                onChange={(e) => setIncludeNotes(e.target.checked)}
-              />
-              <span>Включить заметки</span>
-            </label>
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -223,6 +286,72 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
               />
               <span>Включить самочувствие</span>
             </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={anonymize}
+                onChange={(e) => setAnonymize(e.target.checked)}
+              />
+              <span>Анонимизировать</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={showHtmlNote}
+                onChange={(e) => setShowHtmlNote(e.target.checked)}
+              />
+              <span>Заметка</span>
+            </label>
+            {showHtmlNote && (
+              <div>
+                <label className="label">Текст заметки</label>
+                <textarea
+                  className="input min-h-[80px] resize-y"
+                  value={htmlNote}
+                  onChange={(e) => setHtmlNote(e.target.value)}
+                  placeholder="Ваша заметка..."
+                />
+              </div>
+            )}
+            {!anonymize && (
+              <div>
+                <label className="label">Имя участника (опционально)</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                  placeholder="Ваше имя"
+                />
+              </div>
+            )}
+            <Button onClick={handleDownloadHtml} className="w-full">
+              <DownloadIcon size={18} />
+              Скачать HTML
+            </Button>
+          </div>
+        )}
+
+        {/* Настройки для текста (мессенджер) */}
+        {format === "text" && (
+          <div className="space-y-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={includeCheckins}
+                onChange={(e) => setIncludeCheckins(e.target.checked)}
+              />
+              <span>Включить самочувствие</span>
+            </label>
+            <div>
+              <label className="label">Заметки</label>
+              <textarea
+                className="input min-h-[80px] resize-y"
+                value={messengerNote}
+                onChange={(e) => setMessengerNote(e.target.value)}
+                placeholder="Ваша заметка для мессенджера..."
+              />
+            </div>
             <div>
               <label className="label">Превью</label>
               <textarea
@@ -253,71 +382,6 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
                 Сохранить .txt
               </Button>
             </div>
-          </div>
-        )}
-
-        {/* Настройки для HTML */}
-        {format === "html" && (
-          <div className="space-y-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={includeNotes}
-                onChange={(e) => setIncludeNotes(e.target.checked)}
-              />
-              <span>Включить заметки</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={includeCheckins}
-                onChange={(e) => setIncludeCheckins(e.target.checked)}
-              />
-              <span>Включить самочувствие</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={includeComment}
-                onChange={(e) => setIncludeComment(e.target.checked)}
-              />
-              <span>Мой комментарий</span>
-            </label>
-            {includeComment && (
-              <div>
-                <label className="label">Ваш комментарий к отчёту</label>
-                <textarea
-                  className="input min-h-[100px] resize-y"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Напишите что-нибудь от себя..."
-                />
-              </div>
-            )}
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={anonymize}
-                onChange={(e) => setAnonymize(e.target.checked)}
-              />
-              <span>Анонимизировать</span>
-            </label>
-            {!anonymize && (
-              <div>
-                <label className="label">Имя участника (опционально)</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={authorName}
-                  onChange={(e) => setAuthorName(e.target.value)}
-                  placeholder="Ваше имя"
-                />
-              </div>
-            )}
-            <Button onClick={handleDownloadHtml} className="w-full">
-              <DownloadIcon size={18} />
-              Скачать HTML
-            </Button>
           </div>
         )}
       </div>
