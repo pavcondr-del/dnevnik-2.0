@@ -75,16 +75,63 @@ export function Modal({
   wide?: boolean;
   footer?: ReactNode;
 }) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!open) return;
+    
+    // Сохраняем элемент, который был в фокусе до открытия модалки
+    previousFocusRef.current = document.activeElement as HTMLElement;
+    
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      
+      // Фокус-трап: если Tab на последнем элементе — идём к первому, и наоборот
+      if (e.key === "Tab" && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        
+        if (e.shiftKey) {
+          // Shift+Tab: если на первом элементе — идём к последнему
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab: если на последнем элементе — идём к первому
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
     };
+    
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    
+    // Фокусируемся на первом фокусируемом элементе внутри модалки
+    setTimeout(() => {
+      if (modalRef.current) {
+        const firstFocusable = modalRef.current.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      }
+    }, 50);
+    
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      // Возвращаем фокус на элемент, который был в фокусе до открытия
+      previousFocusRef.current?.focus();
     };
   }, [open, onClose]);
 
@@ -101,6 +148,7 @@ export function Modal({
       aria-labelledby="modal-title"
     >
       <div
+        ref={modalRef}
         className={cn(
           "anim-pop flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-card shadow-pop sm:rounded-2xl",
           wide ? "sm:max-w-2xl" : "sm:max-w-md"

@@ -1,13 +1,10 @@
 ```
-# Coverage reports
-coverage/
-
-# Build artifacts
-dist/
-
 # Dependencies
 node_modules/
-
-# Test results
-**/.vite/**
+# Build artifacts
+dist/
+# Temporary files
+*.tmp
+# Package lock
+package-lock.json
 ```
