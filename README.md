@@ -176,9 +176,50 @@ MIT
 
 Проект открыт для contributions. Если нашли ошибку или есть предложение по улучшению — создайте issue или pull request.
 
-## 📧 Контакты
+### Разработка
 
-По вопросам и предложениям: [создайте issue на GitHub]
+```bash
+# Установка зависимостей
+npm install
+
+# Запуск dev-сервера
+npm run dev
+
+# Запуск тестов
+npm run test          # watch mode
+npm run test:run      # однократный запуск
+npm run test:coverage # с отчётом о покрытии
+
+# Сборка production
+npm run build
+
+# Проверка типов
+npm run typecheck
+```
+
+### Тестирование и CI
+
+Проект использует **Vitest** + **Testing Library** + **MSW** для тестирования.
+
+- unit-тесты для бизнес-логики (расчёт КБЖУ, утилиты, хранилище)
+- интеграционные тесты для Zustand-сторов
+- моки API через MSW (Open Food Facts)
+- покрытие >60% по всему проекту
+
+CI настроен через GitHub Actions: при каждом push в main и pull_request запускаются тесты и собирается покрытие.
+
+![Tests](https://github.com/user/repo/actions/workflows/test.yml/badge.svg)
+
+### Доступность (a11y)
+
+Приложение поддерживает:
+- навигацию с клавиатуры (Tab, Enter, Escape)
+- скринридеры (NVDA, VoiceOver)
+- контраст цветов ≥ 4.5:1
+
+Проверка доступности: `npm run test:a11y` (требуется axe-core).
+
+См. подробный отчёт в [docs/a11y-audit.md](docs/a11y-audit.md).
 
 ---
 
