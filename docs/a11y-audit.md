@@ -91,3 +91,73 @@ npm run test:a11y  # требует установки axe-core
 | Дата | Изменения | Статус |
 |------|-----------|--------|
 | 2024-09-19 | Initial audit | 🔴 7 high, 5 medium, 3 low |
+| 2024-09-19 | Промпт 18: Исправлены все HIGH-priority проблемы | ✅ Все high исправлены |
+
+### Детали исправлений (Промпт 18)
+
+**H1: Фокус-трап в модальных окнах** — ✅ ИСПРАВЛЕНО
+- Файл: `src/components/ui.tsx`
+- Реализован фокус-трап с циклическим перемещением Tab
+- Сохранение предыдущего фокуса и возврат после закрытия
+- Автофокус на первом элементе при открытии
+- Обработка Escape для закрытия
+
+**H2: Aria-label для кнопок без текста** — ✅ ИСПРАВЛЕНО
+- Файлы: `Dashboard.tsx`, `Challenges.tsx`, `Habits.tsx`, `BarcodeScanner.tsx`, `VoiceRecorder.tsx`
+- Добавлены `aria-label` для всех icon-only кнопок
+- Кнопки редактирования/удаления профилей, челленджей, привычек
+
+**H3: Связь label и input через htmlFor/id** — ✅ ИСПРАВЛЕНО
+- Файлы: `Calculators.tsx`, `Dashboard.tsx`
+- Все формы калькуляторов воды и ИМТ связаны
+- Модальные окна активности обновлены
+
+**H4: Progress bars с aria-атрибутами** — ✅ ИСПРАВЛЕНО
+- Файл: `src/components/Ring.tsx`
+- Добавлены `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-label`
+- Применено к `Ring` и `MiniRing`
+
+**H6: Focus-visible стили** — ✅ ИСПРАВЛЕНО
+- Файл: `src/index.css`
+- Добавлены глобальные стили `:focus-visible` для всех интерактивных элементов
+- Видимый контур фокуса (`outline: 3px solid #3b82f6`)
+- Улучшенная видимость в темной теме
+
+**H7: Keyboard-навигация в Diary** — ✅ ИСПРАВЛЕНО
+- Файл: `src/components/Diary.tsx`
+- Добавлены кнопки «←» и «→» с явными `aria-label`
+- Реализована навигация стрелками клавиатуры
+
+**H8: Skip-link** — ✅ ИСПРАВЛЕНО
+- Файл: `src/App.tsx`
+- Добавлена ссылка «Перейти к основному контенту»
+- Видна только при фокусе (клавиша Tab)
+- Добавлен `id="main-content"` на основной контейнер
+
+---
+
+## Текущий статус доступности
+
+### ✅ Выполнено (High priority)
+- [x] H1: Modal — фокус-трап реализован
+- [x] H2: Button — aria-label для иконок добавлен
+- [x] H3: Формы — label и input связаны через htmlFor/id
+- [x] H4: Ring — role="progressbar" + aria-атрибуты добавлены
+- [x] H5: Toast — role="status" + aria-live (уже было реализовано)
+- [x] H6: Focus-visible стили — добавлены в index.css
+- [x] H7: Diary — keyboard-навигация реализована
+- [x] H8: Skip-link — добавлен в App.tsx
+
+### 📋 Ожидает (Medium priority — Roadmap)
+- [ ] M1: Графики — текстовое описание для скринридеров
+- [ ] M2: Поиск продуктов — aria-label на input
+- [ ] M3: Shell — порядок Tab на мобильных
+- [ ] M4: Изображения — alt атрибуты
+- [ ] M5: Переключатели тем — aria-pressed
+- [ ] M6: VoiceRecorder — aria-live для статуса
+
+### 📋 Roadmap (Low priority)
+- [ ] L1: Статьи — контекстные aria-label
+- [ ] L2: Группировка кнопок действий
+- [ ] L3: Модальные окна — проверка Escape
+- [ ] L4: Усиление focus outline

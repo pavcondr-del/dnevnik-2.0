@@ -1,10 +1,13 @@
 ```
 # Dependencies
 node_modules/
-# Build artifacts
-dist/
-# Temporary files
-*.tmp
-# Package lock
+
+# Coverage reports
+coverage/
+
+# Environment
+.env.local
+
+# Build artifacts from package manager
 package-lock.json
 ```
