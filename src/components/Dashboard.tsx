@@ -342,7 +342,9 @@ export default function Dashboard() {
               <option>Другое</option>
             </select>
             <div className="flex gap-2">
+              <label htmlFor="act-minutes" className="sr-only">Минуты активности</label>
               <input
+                id="act-minutes"
                 type="number"
                 min={1}
                 className="input flex-1"
@@ -391,8 +393,9 @@ export default function Dashboard() {
       >
         <div className="space-y-3">
           <div>
-            <label className="label">Название активности</label>
+            <label htmlFor="custom-activity-label" className="label">Название активности</label>
             <input
+              id="custom-activity-label"
               className="input"
               placeholder="Например: Танцы, Йога, Бокс..."
               value={customLabel}
@@ -400,8 +403,9 @@ export default function Dashboard() {
             />
           </div>
           <div>
-            <label className="label">MET (интенсивность)</label>
+            <label htmlFor="custom-activity-met" className="label">MET (интенсивность)</label>
             <input
+              id="custom-activity-met"
               type="number"
               min={0.1}
               step={0.1}

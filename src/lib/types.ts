@@ -102,17 +102,18 @@ export interface HabitLog {
   completed: boolean;
 }
 
-export interface WeightPoint {
-  date: string;
-  kg: number;
-}
-
 export interface ActivityEntry {
   id: string;
   date: string;
   label: string;
   minutes: number;
   kcal: number;
+}
+
+export interface WeightPoint {
+  date: string; // ISO date
+  kg: number;
+  note?: string;
 }
 
 export interface Profile {
@@ -125,6 +126,7 @@ export interface Profile {
   activity: Activity;
   goal: Goal;
   customDeficitPercent?: number;
+  weightHistory: WeightPoint[]; // История взвешиваний для графика динамики
 }
 
 export interface ReminderSettings {

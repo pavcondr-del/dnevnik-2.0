@@ -75,16 +75,63 @@ export function Modal({
   wide?: boolean;
   footer?: ReactNode;
 }) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!open) return;
+    
+    // Сохраняем элемент, который был в фокусе до открытия модалки
+    previousFocusRef.current = document.activeElement as HTMLElement;
+    
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      
+      // Фокус-трап: если Tab на последнем элементе — идём к первому, и наоборот
+      if (e.key === "Tab" && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        
+        if (e.shiftKey) {
+          // Shift+Tab: если на первом элементе — идём к последнему
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab: если на последнем элементе — идём к первому
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
     };
+    
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+    
+    // Фокусируемся на первом фокусируемом элементе внутри модалки
+    setTimeout(() => {
+      if (modalRef.current) {
+        const firstFocusable = modalRef.current.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      }
+    }, 50);
+    
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      // Возвращаем фокус на элемент, который был в фокусе до открытия
+      previousFocusRef.current?.focus();
     };
   }, [open, onClose]);
 
@@ -96,16 +143,21 @@ export function Modal({
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div
+        ref={modalRef}
         className={cn(
           "anim-pop flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-card shadow-pop sm:rounded-2xl",
           wide ? "sm:max-w-2xl" : "sm:max-w-md"
         )}
+        role="document"
       >
         {title !== undefined && (
           <div className="flex items-center justify-between border-b border-line px-5 py-4">
-            <h3 className="text-base font-semibold">{title}</h3>
+            <h3 id="modal-title" className="text-base font-semibold">{title}</h3>
             <button className="icon-btn -mr-2" onClick={onClose} aria-label="Закрыть">
               <XIcon size={18} />
             </button>
@@ -268,17 +320,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastCtx.Provider value={{ push }}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[90] flex flex-col items-center gap-2 px-4 md:bottom-6">
+      <div 
+        className="pointer-events-none fixed inset-x-0 bottom-24 z-[90] flex flex-col items-center gap-2 px-4 md:bottom-6"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}
             className="anim-pop pointer-events-auto flex items-center gap-2 rounded-xl border border-line bg-elev px-4 py-2.5 text-sm shadow-pop"
+            role="alert"
           >
             <span
               className={cn(
                 "flex h-5 w-5 items-center justify-center rounded-full",
                 t.kind === "ok" ? "bg-good/20 text-good" : "bg-bad/20 text-bad"
               )}
+              aria-hidden="true"
             >
               {t.kind === "ok" ? <CheckIcon size={13} /> : <XIcon size={13} />}
             </span>

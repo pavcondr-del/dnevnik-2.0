@@ -68,8 +68,9 @@ function WaterCalc() {
       <Card>
         <div className="space-y-4">
           <div>
-            <label className="label">Вес, кг</label>
+            <label htmlFor="calc-weight" className="label">Вес, кг</label>
             <input
+              id="calc-weight"
               type="number"
               min={30}
               max={200}
@@ -79,8 +80,9 @@ function WaterCalc() {
             />
           </div>
           <div>
-            <label className="label">Уровень активности</label>
+            <label htmlFor="calc-activity" className="label">Уровень активности</label>
             <select
+              id="calc-activity"
               className="input"
               value={activity}
               onChange={(e) => setActivity(e.target.value as any)}
@@ -173,8 +175,9 @@ function BMICalc() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Рост, см</label>
+              <label htmlFor="bmi-height" className="label">Рост, см</label>
               <input
+                id="bmi-height"
                 type="number"
                 min={100}
                 max={250}
@@ -184,8 +187,9 @@ function BMICalc() {
               />
             </div>
             <div>
-              <label className="label">Вес, кг</label>
+              <label htmlFor="bmi-weight" className="label">Вес, кг</label>
               <input
+                id="bmi-weight"
                 type="number"
                 min={30}
                 max={300}

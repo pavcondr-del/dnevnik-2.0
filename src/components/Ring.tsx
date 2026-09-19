@@ -27,7 +27,16 @@ export function Ring({
   const over = target > 0 && value > target * 1.05;
   return (
     <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} className="-rotate-90">
+      <svg 
+        width={size} 
+        height={size} 
+        className="-rotate-90"
+        role="progressbar"
+        aria-valuenow={Math.round(pct * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Прогресс: ${Math.round(pct * 100)}%`}
+      >
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -80,7 +89,16 @@ export function MiniRing({
   return (
     <div className="flex items-center gap-3">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
+        <svg 
+          width={size} 
+          height={size} 
+          className="-rotate-90"
+          role="progressbar"
+          aria-valuenow={Math.round(pct * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${label}: ${Math.round(pct * 100)}%`}
+        >
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-elev)" strokeWidth={stroke} />
           <circle
             cx={size / 2}

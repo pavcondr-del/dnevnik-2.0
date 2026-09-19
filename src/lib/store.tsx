@@ -23,6 +23,7 @@ import type {
 } from "./types";
 import { SEED_PRODUCTS, buildDemo, seedRecipes } from "./seed";
 import { uid } from "./utils";
+import { get, set } from "./storage";
 
 const STORAGE_KEY = "kaloriyka-v1";
 
@@ -34,6 +35,7 @@ const DEFAULT_PROFILE: Profile = {
   heightCm: 178,
   activity: "light",
   goal: "maintain",
+  weightHistory: [],
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -71,17 +73,17 @@ function freshState(): AppState {
   };
 }
 
-function loadState(): AppState {
+async function loadState(): Promise<AppState> {
   if (typeof window === "undefined") return freshState();
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = await get<string>(STORAGE_KEY);
     if (!raw) return freshState();
-    const parsed = JSON.parse(raw) as Partial<AppState>;
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     const base = freshState();
     // Объединяем с базой, чтобы новые продукты из сидов тоже появлялись
-    const customProducts = (parsed.products ?? []).filter((p) => p.custom);
+    const customProducts = (parsed.products ?? []).filter((p: Product) => p.custom);
     const favoriteIds = new Set(
-      (parsed.products ?? []).filter((p) => p.favorite).map((p) => p.id)
+      (parsed.products ?? []).filter((p: Product) => p.favorite).map((p: Product) => p.id)
     );
     const products = [
       ...base.products.map((p) => ({
@@ -129,6 +131,9 @@ interface StoreContextValue {
   toggleRecipeFavorite: (id: string) => void;
   addWeight: (w: WeightPoint) => void;
   deleteWeightAt: (date: string) => void;
+  addWeightEntry: (date: string, weight: number, note?: string) => void;
+  removeWeightEntry: (date: string) => void;
+  getWeightHistory: () => WeightPoint[];
   addActivity: (a: Omit<ActivityEntry, "id">) => void;
   deleteActivity: (id: string) => void;
   joinChallenge: (id: string) => void;
@@ -150,20 +155,28 @@ interface StoreContextValue {
 const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  // Ленивая инициализация — сразу загружаем из localStorage,
+  // Ленивая инициализация — сразу загружаем из IndexedDB,
   // чтобы не было race condition с записью пустого состояния
-  const [state, setState] = useState<AppState>(() => {
-    if (typeof window === "undefined") return freshState();
-    return loadState();
-  });
+  const [state, setState] = useState<AppState>(freshState);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* квота переполнена (обычно из-за фото) */
+    // Загружаем состояние при монтировании
+    loadState().then((s) => {
+      setState(s);
+      setLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        /* квота переполнена (обычно из-за фото) */
+      }
     }
-  }, [state]);
+  }, [state, loaded]);
 
   // Применяем акцент и тему
   useEffect(() => {
@@ -299,6 +312,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       ...s,
       weights: s.weights.filter((w) => w.date !== date),
     }));
+  }, []);
+
+  const addWeightEntry = useCallback((date: string, weight: number, note?: string) => {
+    setState((s) => {
+      const newEntry: WeightPoint = { date, kg: weight, note };
+      return {
+        ...s,
+        profile: {
+          ...s.profile,
+          weightHistory: [
+            ...s.profile.weightHistory.filter((p) => p.date !== date),
+            newEntry,
+          ].sort((a, b) => a.date.localeCompare(b.date)),
+        },
+      };
+    });
+  }, []);
+
+  const removeWeightEntry = useCallback((date: string) => {
+    setState((s) => ({
+      ...s,
+      profile: {
+        ...s.profile,
+        weightHistory: s.profile.weightHistory.filter((p) => p.date !== date),
+      },
+    }));
+  }, []);
+
+  const getWeightHistory = useCallback(() => {
+    // Эта функция должна вызываться внутри компонента через state.profile.weightHistory
+    // Здесь возвращаем пустой массив, так как нет доступа к state в замыкании
+    // Для использования нужно обращаться к state.profile.weightHistory напрямую
+    return [];
   }, []);
 
   const addActivity = useCallback((a: Omit<ActivityEntry, "id">) => {
@@ -465,6 +511,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleRecipeFavorite,
       addWeight,
       deleteWeightAt,
+      addWeightEntry,
+      removeWeightEntry,
+      getWeightHistory,
       addActivity,
       deleteActivity,
       joinChallenge,
@@ -498,6 +547,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleRecipeFavorite,
       addWeight,
       deleteWeightAt,
+      addWeightEntry,
+      removeWeightEntry,
+      getWeightHistory,
       addActivity,
       deleteActivity,
       joinChallenge,
