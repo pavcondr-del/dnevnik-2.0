@@ -35,6 +35,7 @@ const DEFAULT_PROFILE: Profile = {
   heightCm: 178,
   activity: "light",
   goal: "maintain",
+  weightHistory: [],
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -80,9 +81,9 @@ async function loadState(): Promise<AppState> {
     const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     const base = freshState();
     // Объединяем с базой, чтобы новые продукты из сидов тоже появлялись
-    const customProducts = (parsed.products ?? []).filter((p) => p.custom);
+    const customProducts = (parsed.products ?? []).filter((p: Product) => p.custom);
     const favoriteIds = new Set(
-      (parsed.products ?? []).filter((p) => p.favorite).map((p) => p.id)
+      (parsed.products ?? []).filter((p: Product) => p.favorite).map((p: Product) => p.id)
     );
     const products = [
       ...base.products.map((p) => ({

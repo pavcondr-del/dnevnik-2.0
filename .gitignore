@@ -1,15 +1,13 @@
 ```
+# Coverage reports
+coverage/
+
 # Build artifacts
 dist/
-coverage/
-build/
 
 # Dependencies
 node_modules/
 
-# Logs and temp files
-*.log
-
-# Coverage reports
-lcov-report/
+# Testing
+.vite/
 ```

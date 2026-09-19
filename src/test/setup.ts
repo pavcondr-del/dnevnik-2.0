@@ -34,7 +34,9 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Заглушка для Notification API
 class MockNotification {
-  constructor(title, options) {
+  title: string;
+  options?: any;
+  constructor(title: string, options?: any) {
     this.title = title;
     this.options = options;
   }
@@ -44,8 +46,8 @@ class MockNotification {
 window.Notification = MockNotification as any;
 
 // Заглушка для BarcodeDetector API
-class MockBarcodeDetector {
+class MockBarcodeDetectorImpl {
   detect = vi.fn(() => Promise.resolve([]));
   static getSupportedFormats = vi.fn(() => Promise.resolve([]));
 }
-window.BarcodeDetector = MockBarcodeDetector as any;
+(window as any).BarcodeDetector = MockBarcodeDetectorImpl;
