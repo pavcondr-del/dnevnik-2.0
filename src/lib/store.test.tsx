@@ -340,14 +340,14 @@ describe('useStore - активность', () => {
     act(() => {
       result.current.addActivity({
         date: '2024-01-01',
-        type: 'running',
+        label: 'running',
         minutes: 30,
         kcal: 300,
       });
     });
     
     expect(result.current.state.activities.length).toBe(1);
-    expect(result.current.state.activities[0].type).toBe('running');
+    expect(result.current.state.activities[0].label).toBe('running');
     expect(result.current.state.activities[0].minutes).toBe(30);
   });
 
@@ -357,7 +357,7 @@ describe('useStore - активность', () => {
     act(() => {
       result.current.addActivity({
         date: '2024-01-01',
-        type: 'running',
+        label: 'running',
         minutes: 30,
         kcal: 300,
       });

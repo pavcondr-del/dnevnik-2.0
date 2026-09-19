@@ -8,6 +8,6 @@ dist/
 # Dependencies
 node_modules/
 
-# Testing
-.vite/
+# Test results
+**/.vite/**
 ```

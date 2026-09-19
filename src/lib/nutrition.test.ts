@@ -38,9 +38,7 @@ describe('calcBMR', () => {
 
 describe('calcTargets', () => {
   const baseProfile: Profile = {
-    id: 'test',
     name: 'Test',
-    email: '',
     sex: 'male',
     age: 30,
     heightCm: 180,
@@ -48,7 +46,8 @@ describe('calcTargets', () => {
     targetWeightKg: 75,
     activity: 'moderate',
     goal: 'lose',
-    createdAt: Date.now(),
+    weightHistory: [],
+    
   };
 
   it('должен рассчитывать TDEE с коэффициентом активности', () => {
@@ -190,8 +189,8 @@ describe('emptyTotals', () => {
 describe('sumEntries', () => {
   it('должен суммировать нутриенты записей', () => {
     const entries: MealEntry[] = [
-      { id: '1', date: '2024-01-01', meal: 'breakfast', time: '08:00', refId: 'p1', kcal: 300, protein: 15, fat: 10, carbs: 40 },
-      { id: '2', date: '2024-01-01', meal: 'lunch', time: '13:00', refId: 'p2', kcal: 500, protein: 25, fat: 20, carbs: 60 },
+      { id: '1', date: '2024-01-01', meal: 'breakfast', time: '08:00', kind: "product", name: "Test Product", grams: 100, refId: "p1", kcal: 300, protein: 15, fat: 10, carbs: 40 },
+      { id: '2', date: '2024-01-01', meal: 'lunch', time: '13:00', kind: 'product', name: 'Test Product', grams: 100, refId: 'p2', kcal: 500, protein: 25, fat: 20, carbs: 60 },
     ];
     const result = sumEntries(entries);
     expect(result.kcal).toBe(800);
@@ -247,9 +246,9 @@ describe('currentStreak', () => {
     const formatKey = (d: Date) => d.toISOString().split('T')[0];
 
     const entries: MealEntry[] = [
-      { id: '1', date: formatKey(today), meal: 'breakfast', time: '08:00', refId: 'p1', kcal: 300, protein: 15, fat: 10, carbs: 40 },
-      { id: '2', date: formatKey(yesterday), meal: 'breakfast', time: '08:00', refId: 'p1', kcal: 300, protein: 15, fat: 10, carbs: 40 },
-      { id: '3', date: formatKey(dayBeforeYesterday), meal: 'breakfast', time: '08:00', refId: 'p1', kcal: 300, protein: 15, fat: 10, carbs: 40 },
+      { id: '1', date: formatKey(today), meal: 'breakfast', time: '08:00', kind: "product", name: "Test Product", grams: 100, refId: "p1", kcal: 300, protein: 15, fat: 10, carbs: 40 },
+      { id: '2', date: formatKey(yesterday), meal: 'breakfast', time: '08:00', kind: "product", name: "Test Product", grams: 100, refId: "p1", kcal: 300, protein: 15, fat: 10, carbs: 40 },
+      { id: '3', date: formatKey(dayBeforeYesterday), meal: 'breakfast', time: '08:00', kind: "product", name: "Test Product", grams: 100, refId: "p1", kcal: 300, protein: 15, fat: 10, carbs: 40 },
     ];
 
     expect(currentStreak(entries)).toBeGreaterThanOrEqual(2);
@@ -259,7 +258,7 @@ describe('currentStreak', () => {
 describe('buildDayStats', () => {
   it('должен строить статистику за N дней', () => {
     const entries: MealEntry[] = [
-      { id: '1', date: '2024-01-01', meal: 'breakfast', time: '08:00', refId: 'p1', kcal: 300, protein: 15, fat: 10, carbs: 40 },
+      { id: '1', date: '2024-01-01', meal: 'breakfast', time: '08:00', kind: "product", name: "Test Product", grams: 100, refId: "p1", kcal: 300, protein: 15, fat: 10, carbs: 40 },
     ];
     const activities = [{ date: '2024-01-01', kcal: 200 }];
     

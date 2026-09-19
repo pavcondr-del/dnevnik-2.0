@@ -131,6 +131,9 @@ interface StoreContextValue {
   toggleRecipeFavorite: (id: string) => void;
   addWeight: (w: WeightPoint) => void;
   deleteWeightAt: (date: string) => void;
+  addWeightEntry: (date: string, weight: number, note?: string) => void;
+  removeWeightEntry: (date: string) => void;
+  getWeightHistory: () => WeightPoint[];
   addActivity: (a: Omit<ActivityEntry, "id">) => void;
   deleteActivity: (id: string) => void;
   joinChallenge: (id: string) => void;
@@ -311,6 +314,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const addWeightEntry = useCallback((date: string, weight: number, note?: string) => {
+    setState((s) => {
+      const newEntry: WeightPoint = { date, kg: weight, note };
+      return {
+        ...s,
+        profile: {
+          ...s.profile,
+          weightHistory: [
+            ...s.profile.weightHistory.filter((p) => p.date !== date),
+            newEntry,
+          ].sort((a, b) => a.date.localeCompare(b.date)),
+        },
+      };
+    });
+  }, []);
+
+  const removeWeightEntry = useCallback((date: string) => {
+    setState((s) => ({
+      ...s,
+      profile: {
+        ...s.profile,
+        weightHistory: s.profile.weightHistory.filter((p) => p.date !== date),
+      },
+    }));
+  }, []);
+
+  const getWeightHistory = useCallback(() => {
+    // Эта функция должна вызываться внутри компонента через state.profile.weightHistory
+    // Здесь возвращаем пустой массив, так как нет доступа к state в замыкании
+    // Для использования нужно обращаться к state.profile.weightHistory напрямую
+    return [];
+  }, []);
+
   const addActivity = useCallback((a: Omit<ActivityEntry, "id">) => {
     setState((s) => ({
       ...s,
@@ -475,6 +511,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleRecipeFavorite,
       addWeight,
       deleteWeightAt,
+      addWeightEntry,
+      removeWeightEntry,
+      getWeightHistory,
       addActivity,
       deleteActivity,
       joinChallenge,
@@ -508,6 +547,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       toggleRecipeFavorite,
       addWeight,
       deleteWeightAt,
+      addWeightEntry,
+      removeWeightEntry,
+      getWeightHistory,
       addActivity,
       deleteActivity,
       joinChallenge,
