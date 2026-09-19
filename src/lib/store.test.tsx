@@ -391,6 +391,29 @@ describe('useStore - челленджи', () => {
     
     expect(result.current.state.joinedChallenges).not.toContain('c-streak');
   });
+
+  it('не должен дублировать челлендж при повторном присоединении', () => {
+    const { result } = renderHook(() => useStore(), { wrapper });
+    
+    act(() => {
+      result.current.joinChallenge('c-protein');
+      result.current.joinChallenge('c-protein');
+    });
+    
+    const count = result.current.state.joinedChallenges.filter(id => id === 'c-protein').length;
+    expect(count).toBe(1);
+  });
+
+  it('должен корректно обрабатывать выход из несуществующего челленджа', () => {
+    const { result } = renderHook(() => useStore(), { wrapper });
+    const beforeCount = result.current.state.joinedChallenges.length;
+    
+    act(() => {
+      result.current.leaveChallenge('non-existent-challenge');
+    });
+    
+    expect(result.current.state.joinedChallenges.length).toBe(beforeCount);
+  });
 });
 
 describe('useStore - экспорт/импорт', () => {
@@ -434,8 +457,11 @@ describe('useStore - экспорт/импорт', () => {
       habitLogs: [],
     });
     
-    const success = result.current.importBackup(backup);
-    expect(success).toBe(true);
+    act(() => {
+      const success = result.current.importBackup(backup);
+      expect(success).toBe(true);
+    });
+    
     expect(result.current.state.profile.name).toBe('Imported');
   });
 
