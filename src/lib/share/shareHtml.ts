@@ -6,7 +6,7 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
   const dateTo = ruDate(snap.dateTo);
   const generated = new Date().toLocaleDateString("ru-RU");
   const author = opts.anonymize ? "Участник" : (opts.authorName || snap.profile.name || "Участник");
-  const comment = opts.comment || "";
+  const userNote = opts.userNote || "";
 
   // SVG график веса
   const weightChartSvg = snap.weight.trend.length > 1 ? generateWeightChart(snap.weight.trend) : "";
@@ -381,12 +381,11 @@ export function generateShareHtml(snap: ShareSnapshot, opts: ShareOptions): stri
   </section>
   ` : ""}
 
-  ${comment.length > 0 ? `
-  <section class="comment">
-    <h2>Комментарий к отчёту</h2>
-    <div class="pattern-card">
-      <div style="word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.6;">${comment}</div>
-    </div>
+  ${userNote.length > 0 ? `
+  <section class="user-note">
+    <blockquote style="background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #ff6b6b; margin-bottom: 30px;">
+      <p style="font-size: 1.1rem; font-style: normal; color: #e6e6e6; line-height: 1.6; margin: 0;">${userNote}</p>
+    </blockquote>
   </section>
   ` : ""}
 

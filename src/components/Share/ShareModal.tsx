@@ -30,8 +30,6 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
   const [cardStyle, setCardStyle] = useState<ShareCardStyle>("minimal");
   const [cardSize, setCardSize] = useState<ShareCardSize>("square");
   const [anonymize, setAnonymize] = useState(false);
-  const [includeComment, setIncludeComment] = useState(false);
-  const [commentText, setCommentText] = useState("");
   const [showMacros, setShowMacros] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [includeUserNote, setIncludeUserNote] = useState(false);
@@ -84,10 +82,9 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
     cardStyle,
     cardSize,
     anonymize,
-    comment: includeComment ? commentText : undefined,
     photoUrl, // Передаём фото в опции
     userNote: includeUserNote ? userNoteText : undefined, // Передаём заметку пользователя
-  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, showMacros, authorName, cardStyle, cardSize, anonymize, includeComment, commentText, photoUrl, includeUserNote, userNoteText]);
+  }), [format, period, dateFrom, dateTo, includeNotes, includeCheckins, showMacros, authorName, cardStyle, cardSize, anonymize, photoUrl, includeUserNote, userNoteText]);
 
   const snapshot = useMemo(() => buildSnapshot(state, options), [state, options]);
 
@@ -203,15 +200,15 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
                   type="file"
                   accept="image/*"
                   onChange={handlePhotoUpload}
-                  className="block w-full text-sm text-gray-500 dark:text-gray-400
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    dark:file:bg-blue-900/30 dark:file:text-blue-300
-                    hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50
-                    transition-colors cursor-pointer"
+                  className="hidden"
+                  id="card-photo-upload"
                 />
+                <label
+                  htmlFor="card-photo-upload"
+                  className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Выбрать файл
+                </label>
                 {photoUrl && (
                   <button
                     onClick={() => setPhotoUrl(null)}
@@ -367,15 +364,15 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
                   type="file"
                   accept="image/*"
                   onChange={handlePhotoUpload}
-                  className="block w-full text-sm text-gray-500 dark:text-gray-400
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    dark:file:bg-blue-900/30 dark:file:text-blue-300
-                    hover:file:bg-blue-100 dark:hover:file:bg-blue-900/50
-                    transition-colors cursor-pointer"
+                  className="hidden"
+                  id="html-photo-upload"
                 />
+                <label
+                  htmlFor="html-photo-upload"
+                  className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                >
+                  Выбрать файл
+                </label>
                 {photoUrl && (
                   <button
                     onClick={() => setPhotoUrl(null)}
@@ -417,26 +414,6 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                checked={includeComment}
-                onChange={(e) => setIncludeComment(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Мой комментарий</span>
-            </label>
-            {includeComment && (
-              <div>
-                <label className="label">Ваш комментарий к отчёту</label>
-                <textarea
-                  className="input min-h-[100px] resize-y"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Напишите что-нибудь от себя..."
-                />
-              </div>
-            )}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
                 checked={includeUserNote}
                 onChange={(e) => setIncludeUserNote(e.target.checked)}
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -444,13 +421,15 @@ export function ShareModal({ open, onClose }: ShareModalProps) {
               <span className="text-sm text-gray-700 dark:text-gray-300">Добавить заметку</span>
             </label>
             {includeUserNote && (
-              <textarea
-                value={userNoteText}
-                onChange={(e) => setUserNoteText(e.target.value)}
-                placeholder="Ваш текст..."
-                rows={2}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm resize-none"
-              />
+              <div>
+                <label className="label">Текст заметки</label>
+                <textarea
+                  className="input min-h-[100px] resize-y"
+                  value={userNoteText}
+                  onChange={(e) => setUserNoteText(e.target.value)}
+                  placeholder="Напишите что-нибудь от себя..."
+                />
+              </div>
             )}
             <label className="flex items-center gap-2 cursor-pointer">
               <input

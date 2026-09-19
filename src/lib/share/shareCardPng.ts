@@ -296,14 +296,14 @@ export async function generateShareCard(
   ctx.font = "400 20px system-ui, -apple-system, sans-serif";
   ctx.textAlign = "center";
   
-  // Пользовательская заметка (если есть)
+  // Пользовательская заметка (если есть) - размещаем перед датой
   let footerY = size.height - 80;
   if (opts.userNote) {
     const noteLines = opts.userNote.split('\n');
     const maxCharsPerLine = Math.floor((size.width - padding * 2) / 18);
     
     ctx.fillStyle = style.text;
-    ctx.font = "italic 24px system-ui, -apple-system, sans-serif";
+    ctx.font = "normal 22px system-ui, -apple-system, sans-serif";
     
     noteLines.forEach(line => {
       const wrappedLines = line.match(new RegExp(`.{1,${maxCharsPerLine}}`, 'g')) || [];
