@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { StoreProvider, useStore } from './store';
 import type { Profile, Settings, MealEntry, WeightPoint } from './types';
 
@@ -39,8 +39,13 @@ describe('useStore - профиль', () => {
     expect(result.current.state.profile.weightKg).toBe(80);
   });
 
-  it('должен сохранять профиль в localStorage', () => {
+  it('должен сохранять профиль в localStorage', async () => {
     const { result } = renderHook(() => useStore(), { wrapper });
+    
+    // Ждём初始альной загрузки состояния
+    await waitFor(() => {
+      expect(result.current.state.profile).toBeDefined();
+    });
     
     act(() => {
       result.current.saveProfile({
@@ -49,9 +54,14 @@ describe('useStore - профиль', () => {
       });
     });
     
-    const stored = localStorage.getItem('kaloriyka-v1');
-    expect(stored).toBeDefined();
-    const parsed = JSON.parse(stored!);
+    // Ждём пока useEffect сохранит состояние в localStorage
+    await waitFor(() => {
+      const stored = localStorage.getItem('kaloriyka-v1');
+      expect(stored).toBeTruthy();
+    }, { timeout: 1000 });
+    
+    const stored = localStorage.getItem('kaloriyka-v1')!;
+    const parsed = JSON.parse(stored);
     expect(parsed.profile.name).toBe('Persistent User');
   });
 });

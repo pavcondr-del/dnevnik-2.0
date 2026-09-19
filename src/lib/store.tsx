@@ -23,6 +23,7 @@ import type {
 } from "./types";
 import { SEED_PRODUCTS, buildDemo, seedRecipes } from "./seed";
 import { uid } from "./utils";
+import { get, set } from "./storage";
 
 const STORAGE_KEY = "kaloriyka-v1";
 
@@ -71,12 +72,12 @@ function freshState(): AppState {
   };
 }
 
-function loadState(): AppState {
+async function loadState(): Promise<AppState> {
   if (typeof window === "undefined") return freshState();
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = await get<string>(STORAGE_KEY);
     if (!raw) return freshState();
-    const parsed = JSON.parse(raw) as Partial<AppState>;
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     const base = freshState();
     // Объединяем с базой, чтобы новые продукты из сидов тоже появлялись
     const customProducts = (parsed.products ?? []).filter((p) => p.custom);
@@ -150,20 +151,28 @@ interface StoreContextValue {
 const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  // Ленивая инициализация — сразу загружаем из localStorage,
+  // Ленивая инициализация — сразу загружаем из IndexedDB,
   // чтобы не было race condition с записью пустого состояния
-  const [state, setState] = useState<AppState>(() => {
-    if (typeof window === "undefined") return freshState();
-    return loadState();
-  });
+  const [state, setState] = useState<AppState>(freshState);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* квота переполнена (обычно из-за фото) */
+    // Загружаем состояние при монтировании
+    loadState().then((s) => {
+      setState(s);
+      setLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loaded) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        /* квота переполнена (обычно из-за фото) */
+      }
     }
-  }, [state]);
+  }, [state, loaded]);
 
   // Применяем акцент и тему
   useEffect(() => {

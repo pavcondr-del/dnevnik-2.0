@@ -1,7 +1,13 @@
 ```
+# Coverage reports
+coverage/
+
+# Build artifacts
+dist/
+
 # Dependencies
 node_modules/
 
-# Vite/Vitest cache
-.node_vite/
+# Test results
+.vite/
 ```
