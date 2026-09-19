@@ -9,7 +9,6 @@ import {
   ChartIcon,
   CheckIcon,
   ChefIcon,
-  ClockIcon,
   DatabaseIcon,
   DiaryIcon,
   DropIcon,
@@ -47,8 +46,6 @@ const EXTRA_NAV: NavItem[] = [
   { href: "weightProjection", label: "Прогноз веса", icon: TrendingDownIcon },
   { href: "simulator", label: "Симулятор", icon: TrendingDownIcon },
   { href: "notes", label: "Заметки", icon: BookIcon },
-  { href: "mealPlanner", label: "Что есть дома", icon: ChefIcon },
-  { href: "mealHistory", label: "Что я ел раньше", icon: ClockIcon },
   { href: "habits", label: "Привычки", icon: CheckIcon },
   { href: "backup", label: "Резервные копии", icon: DatabaseIcon },
   { href: "share", label: "Поделиться", icon: ShareIcon },
@@ -71,7 +68,6 @@ interface ShellProps {
 function Logo() {
   return (
     <div className="flex items-center gap-2.5">
-      <img src="./icons/icon.svg" alt="" className="h-9 w-9" />
       <span className="text-lg font-bold tracking-tight">
         Гармония <span className="text-accent">Рациона</span>
       </span>
@@ -187,7 +183,7 @@ export function Shell({ children, currentPage, onNavigate }: ShellProps) {
           <div className="flex items-center gap-1">
             {!online && (
               <span className="mr-1 rounded-full bg-warn/15 px-2 py-1 text-[11px] font-medium text-warn">
-                Офлайн
+                Нет сети
               </span>
             )}
             <button
@@ -200,10 +196,10 @@ export function Shell({ children, currentPage, onNavigate }: ShellProps) {
           </div>
         </header>
 
-        {/* Десктоп-статус офлайна */}
+        {/* Десктоп-статус */}
         {!online && (
           <div className="no-print hidden border-b border-warn/30 bg-warn/10 px-6 py-1.5 text-center text-xs text-warn md:block">
-            Нет сети — приложение работает офлайн, данные сохраняются на устройстве
+            Нет сети — данные сохраняются на устройстве
           </div>
         )}
 

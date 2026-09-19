@@ -12,7 +12,7 @@ export default function SharePage() {
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">Поделиться результатом</h1>
         <p className="mt-1 text-sm text-mut">
-          Создайте карточку для соцсетей, текст для мессенджера или HTML-отчёт для отправки кому угодно. Всё работает офлайн.
+          Создайте карточку для соцсетей, текст для мессенджера или HTML-отчёт для отправки кому угодно.
         </p>
       </div>
 
@@ -96,10 +96,6 @@ export default function SharePage() {
       <Card>
         <h2 className="mb-4 font-semibold">Особенности</h2>
         <ul className="space-y-2 text-sm text-mut">
-          <li className="flex items-start gap-2">
-            <span className="text-accent">✓</span>
-            <span>Всё работает офлайн — никаких серверов и интернета</span>
-          </li>
           <li className="flex items-start gap-2">
             <span className="text-accent">✓</span>
             <span>Анонимизация — можно скрыть имя участника</span>

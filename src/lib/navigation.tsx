@@ -11,8 +11,6 @@ export type Page =
   | "weightProjection"
   | "simulator"
   | "notes"
-  | "mealPlanner"
-  | "mealHistory"
   | "habits"
   | "backup"
   | "share"

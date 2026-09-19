@@ -9,8 +9,6 @@ import CalorieCalculator from "./components/CalorieCalculator";
 import WeightProjection from "./components/WeightProjection";
 import Simulator from "./components/Simulator";
 import Notes from "./components/Notes";
-import MealPlanner from "./components/MealPlanner";
-import MealHistory from "./components/MealHistory";
 import HabitTracker from "./components/HabitTracker";
 import BackupManager from "./components/BackupManager";
 import SharePage from "./components/Share/SharePage";
@@ -47,10 +45,6 @@ function AppContent({ currentPage }: AppContentProps) {
         return <Simulator />;
       case "notes":
         return <Notes />;
-      case "mealPlanner":
-        return <MealPlanner />;
-      case "mealHistory":
-        return <MealHistory />;
       case "habits":
         return <HabitTracker />;
       case "backup":
